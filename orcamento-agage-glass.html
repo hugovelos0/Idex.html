@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Orçamento - AGAGÊ GLASS</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background: #f4f4f4; color: #333; }
+        .container { background: white; padding: 30px; max-width: 850px; margin: auto; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); position: relative; }
+        
+        /* Cabeçalho */
+        header { text-align: center; border-bottom: 2px solid #0056b3; margin-bottom: 20px; padding-bottom: 10px; }
+        h1 { color: #0056b3; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+        .slogan { font-style: italic; color: #666; font-size: 14px; }
+        
+        /* Layout */
+        .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .campo-grupo { display: flex; flex-direction: column; }
+        label { font-weight: bold; font-size: 13px; margin-bottom: 5px; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        
+        /* Tabela */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #0056b3; color: white; padding: 12px; text-align: left; }
+        td { border-bottom: 1px solid #eee; padding: 10px; }
+        .item-total { font-weight: bold; color: #333; }
+        
+        /* Botões */
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-add { background: #007bff; color: white; margin: 15px 0; }
+        .btn-add:hover { background: #0056b3; }
+        .btn-print { background: #28a745; color: white; width: 100%; font-size: 18px; margin-top: 20px; }
+        .btn-print:hover { background: #218838; }
+        .btn-del { background: #dc3545; color: white; padding: 5px 10px; font-size: 12px; }
+
+        /* Totais */
+        .totais-container { display: flex; justify-content: flex-end; margin-top: 20px; }
+        .totais-box { width: 250px; background: #f9f9f9; padding: 15px; border-radius: 5px; }
+        .totais-box p { display: flex; justify-content: space-between; margin: 5px 0; }
+        .total-destaque { font-size: 1.2rem; color: #0056b3; border-top: 1px solid #ccc; padding-top: 10px; margin-top: 10px !important; }
+
+        /* Rodapé Condições */
+        .condicoes { font-size: 13px; background: #fff; padding: 15px; border: 1px dashed #ccc; border-radius: 5px; margin-top: 30px; }
+        
+        /* Ajuste para Impressão */
+        @media print {
+            .btn, .btn-del { display: none !important; }
+            body { background: white; margin: 0; }
+            .container { box-shadow: none; max-width: 100%; }
+            input { border: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>AGAGÊ GLASS</h1>
+        <p class="slogan">"O Diferencial para sua Obra"</p>
+    </header>
+
+    <div class="grid">
+        <div class="campo-grupo">
+            <label>Cliente:</label>
+            <input type="text" placeholder="Nome completo ou Razão Social">
+        </div>
+        <div class="campo-grupo">
+            <label>Telefone / WhatsApp:</label>
+            <input type="text" placeholder="(71) 99999-9999">
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Descrição do Serviço/Produto</th>
+                <th width="60">Qtd</th>
+                <th width="110">R$ Unit</th>
+                <th width="110">Total</th>
+                <th width="40" class="btn-col"></th>
+            </tr>
+        </thead>
+        <tbody id="itens">
+            <tr>
+                <td><input type="text" style="width: 95%;" placeholder="Ex: Box de Vidro Temperado 8mm"></td>
+                <td><input type="number" class="qtd" value="1" min="1" oninput="calcular()"></td>
+                <td><input type="number" class="unit" value="0" step="0.01" oninput="calcular()"></td>
+                <td class="item-total">R$ 0,00</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button class="btn btn-add" onclick="addLinha()">+ Adicionar Item</button>
+
+    <div class="totais-container">
+        <div class="totais-box">
+            <p>Subtotal: <span id="subtotal">R$ 0,00</span></p>
+            <p>Desconto: <input type="number" id="inputDesconto" value="10" style="width: 40px; padding: 2px;" oninput="calcular()"> %</p>
+            <p class="total-destaque"><strong>TOTAL:</strong> <span id="totalFinal">R$ 0,00</span></p>
+        </div>
+    </div>
+
+    <div class="condicoes">
+        <p><strong>Prazo de Entrega:</strong> 7 a 10 dias úteis.</p>
+        <p><strong>Condições de Pagamento:</strong> 50% de entrada e o restante na finalização.</p>
+        <p><strong>Formas de Recebimento:</strong> Pix, Espécie ou Cartão (até 2x sem juros).</p>
+        <p><em>* Orçamento válido por 10 dias.</em></p>
+    </div>
+
+    <button class="btn btn-print" onclick="window.print()">GERAR PDF / IMPRIMIR</button>
+</div>
+
+<script>
+    function addLinha() {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="text" style="width: 95%;"></td>
+            <td><input type="number" class="qtd" value="1" min="1" oninput="calcular()"></td>
+            <td><input type="number" class="unit" value="0" step="0.01" oninput="calcular()"></td>
+            <td class="item-total">R$ 0,00</td>
+            <td><button class="btn btn-del" onclick="removerLinha(this)">X</button></td>
+        `;
+        document.getElementById('itens').appendChild(tr);
+    }
+
+    function removerLinha(btn) {
+        btn.closest('tr').remove();
+        calcular();
+    }
+
+    function calcular() {
+        let subtotal = 0;
+        const linhas = document.querySelectorAll('#itens tr');
+        
+        linhas.forEach(linha => {
+            const qtd = parseFloat(linha.querySelector('.qtd').value) || 0;
+            const unit = parseFloat(linha.querySelector('.unit').value) || 0;
+            const total = qtd * unit;
+            subtotal += total;
+            linha.querySelector('.item-total').innerText = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        });
+
+        const percDesconto = parseFloat(document.getElementById('inputDesconto').value) || 0;
+        const valorDesconto = subtotal * (percDesconto / 100);
+        const totalFinal = subtotal - valorDesconto;
+
+        document.getElementById('subtotal').innerText = subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('totalFinal').innerText = totalFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+</script>
+
+</body>
+</html>
